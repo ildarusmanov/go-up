@@ -39,10 +39,3 @@ func (d *Dependencies) Get(name string) (interface{}, error) {
 
 	return s, nil
 }
-
-func (d *Dependencies) Remove(name string) {
-	d.mux.Lock()
-	defer d.mux.Unlock()
-
-	delete(d.items, name)
-}
