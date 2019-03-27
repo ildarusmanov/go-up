@@ -1,4 +1,4 @@
-package app
+package dependencies
 
 import (
 	"errors"
@@ -20,7 +20,7 @@ func NewDependencies() *Dependencies {
 	}
 }
 
-func (d *Dependencies) Add(name string, service Service) {
+func (d *Dependencies) Add(name string, service interface{}) {
 	d.mux.Lock()
 	defer d.mux.Unlock()
 

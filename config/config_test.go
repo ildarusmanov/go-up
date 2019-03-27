@@ -1,10 +1,10 @@
-package app_test
+package config_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/ildarusmanov/go-up/app"
+	. "github.com/ildarusmanov/go-up/config"
 )
 
 var _ = Describe("Config", func() {

@@ -1,29 +1,44 @@
-package app
+package goup
 
-import "context"
+import (
+	"context"
+
+	"github.com/ildarusmanov/go-up/config"
+	"github.com/ildarusmanov/go-up/dependencies"
+)
 
 // Factory builds a service
 // ctx contains value with key Application
 // it should return a pointer to service instance and error
-type ServiceFactory func(ctx context.Context) (Service, error)
+type ServiceFactory func(ctx context.Context) (interface{}, error)
 
 // Service is just an empty interface
 type Service interface{}
 
+type ConfigManager interface {
+	Set(key string, value interface{})
+	Get(key string) (interface{}, bool)
+}
+
+type DependenciesManager interface {
+	Add(name string, service interface{})
+	Get(name string) (interface{}, error)
+}
+
 type Application struct {
 	ctx          context.Context
-	Config       *Config
-	Dependencies *Dependencies
+	Config       ConfigManager
+	Dependencies DependenciesManager
 }
 
 // Creates new application
-func NewApplication(ctx context.Context, d *Dependencies, c *Config) *Application {
+func NewApplication(ctx context.Context, d DependenciesManager, c ConfigManager) *Application {
 	if d == nil {
-		d = NewDependencies()
+		d = dependencies.NewDependencies()
 	}
 
 	if c == nil {
-		c = NewConfig()
+		c = config.NewConfig()
 	}
 
 	a := &Application{
@@ -51,16 +66,16 @@ func (a *Application) AddServiceFactory(srvName string, f ServiceFactory) error 
 }
 
 // Find service by name
-func (a *Application) GetService(srvName string) (Service, error) {
+func (a *Application) GetService(srvName string) (interface{}, error) {
 	return a.Dependencies.Get(srvName)
 }
 
 // Set config variable
-func (a *Application) SetConfig(key, value string) {
+func (a *Application) SetConfig(key string, value interface{}) {
 	a.Config.Set(key, value)
 }
 
 // Get config by key
-func (a *Application) GetConfig(key string) (string, bool) {
+func (a *Application) GetConfig(key string) (interface{}, bool) {
 	return a.Config.Get(key)
 }
