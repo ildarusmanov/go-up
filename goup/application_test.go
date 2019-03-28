@@ -2,6 +2,7 @@ package goup_test
 
 import (
 	"context"
+	"errors"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -67,7 +68,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Describe(".SetConfig(), .GetConfig(), .GetConfigString()", func() {
+		Describe(".RequireConfig(), .SetConfig(), .UnsetConfg(), .GetConfig(), .GetConfigString()", func() {
 			var (
 				key, val string
 			)
@@ -82,15 +83,21 @@ var _ = Describe("Application", func() {
 					config.EXPECT().Set(key, val).AnyTimes()
 					config.EXPECT().Get(key).AnyTimes().Return(val, true)
 					config.EXPECT().GetString(key).AnyTimes().Return(val, true)
+					config.EXPECT().Unset(key).AnyTimes().Return(nil)
+					config.EXPECT().RequireKeys([]string{key}).AnyTimes().Return(nil)
 
 					a.SetConfig(key, val)
 					retV, retOk := a.GetConfig(key)
 					retStrV, retStrOk := a.GetConfigString(key)
+					reqErr := a.RequireConfig([]string{key})
+					unsetErr := a.UnsetConfig(key)
 
 					Expect(retV.(string)).To(Equal(val))
 					Expect(retOk).To(BeTrue())
 					Expect(retStrV).To(Equal(val))
 					Expect(retStrOk).To(BeTrue())
+					Expect(reqErr).To(BeNil())
+					Expect(unsetErr).To(BeNil())
 				})
 			})
 
@@ -98,13 +105,19 @@ var _ = Describe("Application", func() {
 				It("should not found non-existing value", func() {
 					config.EXPECT().Get(key).AnyTimes().Return(nil, false)
 					config.EXPECT().GetString(key).AnyTimes().Return("", false)
+					config.EXPECT().Unset(key).AnyTimes().Return(errors.New("err"))
+					config.EXPECT().RequireKeys([]string{key}).AnyTimes().Return(errors.New("err"))
 
 					_, retOk := a.GetConfig(key)
 					retStrV, retStrOk := a.GetConfigString(key)
+					reqErr := a.RequireConfig([]string{key})
+					unsetErr := a.UnsetConfig(key)
 
 					Expect(retOk).To(BeFalse())
 					Expect(retStrV).To(Equal(""))
 					Expect(retStrOk).To(BeFalse())
+					Expect(reqErr).NotTo(BeNil())
+					Expect(unsetErr).NotTo(BeNil())
 				})
 			})
 		})

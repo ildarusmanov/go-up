@@ -108,9 +108,19 @@ func (a *Application) GetService(srvName string) (interface{}, error) {
 	return a.Dependencies().Get(srvName)
 }
 
+// Check config with keys
+func (a *Application) RequireConfig(keys []string) error {
+	return a.Config().RequireKeys(keys)
+}
+
 // Set config variable
 func (a *Application) SetConfig(key string, value interface{}) {
 	a.Config().Set(key, value)
+}
+
+// Remove config by key
+func (a *Application) UnsetConfig(key string) error {
+	return a.Config().Unset(key)
 }
 
 // Get config by key
