@@ -67,6 +67,20 @@ func (mr *MockConfigManagerMockRecorder) Set(key, value interface{}) *gomock.Cal
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockConfigManager)(nil).Set), key, value)
 }
 
+// Unset mocks base method
+func (m *MockConfigManager) Unset(arg0 string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Unset", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Unset indicates an expected call of Unset
+func (mr *MockConfigManagerMockRecorder) Unset(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unset", reflect.TypeOf((*MockConfigManager)(nil).Unset), arg0)
+}
+
 // Get mocks base method
 func (m *MockConfigManager) Get(key string) (interface{}, bool) {
 	m.ctrl.T.Helper()

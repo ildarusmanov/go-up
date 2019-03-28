@@ -9,11 +9,11 @@ import (
 
 var _ = Describe("Config", func() {
 	var (
-		c *Config
+		c *EnvConfig
 	)
 
 	BeforeEach(func() {
-		c = NewConfig()
+		c = NewEnvConfig()
 	})
 
 	It("should create new config instance", func() {

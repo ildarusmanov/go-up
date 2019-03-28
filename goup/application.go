@@ -18,6 +18,7 @@ type Service interface{}
 
 type ConfigManager interface {
 	Set(key string, value interface{})
+	Unset(string) error
 	Get(key string) (interface{}, bool)
 	GetString(key string) (string, bool)
 	RequireKeys([]string) error

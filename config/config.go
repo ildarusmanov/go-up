@@ -19,6 +19,16 @@ func (c *Config) Set(key string, value interface{}) {
 	c.values[key] = value
 }
 
+func (c *Config) Unset(key string) error {
+	if _, ok := c.values[key]; !ok {
+		return errors.New("Undefined key")
+	}
+
+	delete(c.values, key)
+
+	return nil
+}
+
 func (c *Config) Get(key string) (value interface{}, ok bool) {
 	value, ok = c.values[key]
 
