@@ -1,5 +1,10 @@
 package config
 
+import (
+	"errors"
+	"log"
+)
+
 type Config struct {
 	values map[string]interface{}
 }
@@ -30,4 +35,22 @@ func (c *Config) GetString(key string) (string, bool) {
 	s, ok := v.(string)
 
 	return s, ok
+}
+
+func (c *Config) RequireKeys(keys []string) error {
+	hasErrors := false
+
+	for _, k := range keys {
+		if _, ok := c.values[k]; !ok {
+			hasErrors = true
+
+			log.Printf("Config with key %s is undefined", k)
+		}
+	}
+
+	if hasErrors {
+		return errors.New("Required keys does not exist in config")
+	}
+
+	return nil
 }

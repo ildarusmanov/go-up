@@ -97,6 +97,20 @@ func (mr *MockConfigManagerMockRecorder) GetString(key interface{}) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetString", reflect.TypeOf((*MockConfigManager)(nil).GetString), key)
 }
 
+// RequireKeys mocks base method
+func (m *MockConfigManager) RequireKeys(arg0 []string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "RequireKeys", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// RequireKeys indicates an expected call of RequireKeys
+func (mr *MockConfigManagerMockRecorder) RequireKeys(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RequireKeys", reflect.TypeOf((*MockConfigManager)(nil).RequireKeys), arg0)
+}
+
 // MockDependenciesManager is a mock of DependenciesManager interface
 type MockDependenciesManager struct {
 	ctrl     *gomock.Controller

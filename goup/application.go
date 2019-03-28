@@ -20,6 +20,7 @@ type ConfigManager interface {
 	Set(key string, value interface{})
 	Get(key string) (interface{}, bool)
 	GetString(key string) (string, bool)
+	RequireKeys([]string) error
 }
 
 type DependenciesManager interface {

@@ -21,6 +21,26 @@ var _ = Describe("Config", func() {
 	})
 
 	Describe("methods", func() {
+		Describe(".RequireKeys()", func() {
+			var (
+				key   string
+				value string
+			)
+
+			BeforeEach(func() {
+				key = "somekey"
+				value = "somevalue"
+
+				c.Set(key, value)
+			})
+
+			It("should find existing key", func() {
+				Expect(c.RequireKeys([]string{key})).To(BeNil())
+				Expect(c.RequireKeys([]string{key, key + "1"})).NotTo(BeNil())
+				Expect(c.RequireKeys([]string{key + "1"})).NotTo(BeNil())
+			})
+		})
+
 		Describe(".Get(), .Set()", func() {
 			var (
 				key   string
@@ -59,7 +79,6 @@ var _ = Describe("Config", func() {
 			})
 
 			Context("with empty config", func() {
-
 				It(".Get() should not return a value", func() {
 					_, ok := c.Get(key)
 
