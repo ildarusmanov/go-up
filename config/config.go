@@ -19,3 +19,15 @@ func (c *Config) Get(key string) (value interface{}, ok bool) {
 
 	return
 }
+
+func (c *Config) GetString(key string) (string, bool) {
+	v, ok := c.values[key]
+
+	if !ok {
+		return "", false
+	}
+
+	s, ok := v.(string)
+
+	return s, ok
+}

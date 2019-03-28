@@ -14,6 +14,7 @@ import (
 var _ = Describe("Application", func() {
 	var (
 		a            *Application
+		ctx          context.Context
 		mockCtrl     *gomock.Controller
 		config       *mock_goup.MockConfigManager
 		dependencies *mock_goup.MockDependenciesManager
@@ -23,8 +24,8 @@ var _ = Describe("Application", func() {
 		mockCtrl = gomock.NewController(GinkgoT())
 		config = mock_goup.NewMockConfigManager(mockCtrl)
 		dependencies = mock_goup.NewMockDependenciesManager(mockCtrl)
-
-		a = NewApplication(context.Background(), dependencies, config)
+		ctx = context.WithValue(context.Background(), "k", "v")
+		a = NewApplication().WithDependencies(dependencies).WithConfig(config).WithContext(ctx)
 	})
 
 	AfterEach(func() {
@@ -66,7 +67,7 @@ var _ = Describe("Application", func() {
 			})
 		})
 
-		Describe(".SetConfig(), .GetConfig()", func() {
+		Describe(".SetConfig(), .GetConfig(), .GetConfigString()", func() {
 			var (
 				key, val string
 			)
@@ -80,23 +81,39 @@ var _ = Describe("Application", func() {
 				It("should set and get value", func() {
 					config.EXPECT().Set(key, val).AnyTimes()
 					config.EXPECT().Get(key).AnyTimes().Return(val, true)
+					config.EXPECT().GetString(key).AnyTimes().Return(val, true)
 
 					a.SetConfig(key, val)
 					retV, retOk := a.GetConfig(key)
+					retStrV, retStrOk := a.GetConfigString(key)
 
 					Expect(retV.(string)).To(Equal(val))
 					Expect(retOk).To(BeTrue())
+					Expect(retStrV).To(Equal(val))
+					Expect(retStrOk).To(BeTrue())
 				})
 			})
 
 			Context("without value", func() {
 				It("should not found non-existing value", func() {
 					config.EXPECT().Get(key).AnyTimes().Return(nil, false)
+					config.EXPECT().GetString(key).AnyTimes().Return("", false)
 
 					_, retOk := a.GetConfig(key)
+					retStrV, retStrOk := a.GetConfigString(key)
 
 					Expect(retOk).To(BeFalse())
+					Expect(retStrV).To(Equal(""))
+					Expect(retStrOk).To(BeFalse())
 				})
+			})
+		})
+
+		Describe(".WithContext(), .Context()", func() {
+			It("should change context", func() {
+				v := a.WithContext(context.WithValue(ctx, "k1", "v1")).Context().Value("k1").(string)
+
+				Expect(v).To(Equal("v1"))
 			})
 		})
 	})
