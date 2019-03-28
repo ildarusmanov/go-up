@@ -1,10 +1,10 @@
-package app_test
+package dependencies_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/ildarusmanov/go-up/app"
+	. "github.com/ildarusmanov/go-up/dependencies"
 )
 
 var _ = Describe("Dependencies", func() {
