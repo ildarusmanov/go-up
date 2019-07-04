@@ -5,10 +5,13 @@ import (
 	"log"
 	"os"
 	"text/template"
+
+	"gopkg.in/yaml.v2"
 )
 
 var (
-	pkgname = flag.String("pkgname", "", "Your application package name.")
+	pkgname          = flag.String("pkgname", "", "Your application package name.")
+	servicesYamlFile = flag.String("cfg", "", "Services config file in YAML format")
 )
 
 func main() {
@@ -16,7 +19,7 @@ func main() {
 
 	mainTmpl := template.Must(template.New("main").Parse(MainTemplate))
 	appTmpl := template.Must(template.New("app").Parse(AppTemplate))
-	// factoryTmpl := template.Must(template.New("factory").Parse(FactoryTemplate))
+	factoryTmpl := template.Must(template.New("factory").Parse(FactoryTemplate))
 
 	wdir, err := os.Getwd()
 
@@ -43,7 +46,36 @@ func main() {
 	mainTmpl.Execute(mainFile, map[string]string{
 		"Pkgname": *pkgname,
 	})
-	appTmpl.Execute(appFile, map[string]interface{}{})
+
+	if *servicesYamlFile != "" {
+		f, err := os.Open(*servicesYamlFile)
+
+		if err != nil {
+			log.Fatalf("Can not open servces config file %s: %s", *servicesYamlFile, err)
+		}
+
+		d := yaml.NewDecoder(f)
+
+		cfg := &ServicesConfig{}
+
+		if err := d.Decode(cfg); err != nil {
+			log.Fatalf("Can not parse services config %s: %s", *servicesYamlFile, err)
+		}
+
+		appTmpl.Execute(appFile, cfg)
+
+		for _, srv := range cfg.Services {
+			srvFName := wdir + "/app/" + srv.Filename
+			srvFile, err := os.Create(srvFName)
+
+			if err != nil {
+				log.Printf("Can not create service file %s: %s\n", srvFName, err)
+				continue
+			}
+
+			factoryTmpl.Execute(srvFile, srv)
+		}
+	}
 
 	log.Println("Done!")
 }
