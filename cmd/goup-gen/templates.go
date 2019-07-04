@@ -74,14 +74,14 @@ func NewApp(ctx context.Context) *App {
 }
 
 {{range .Services}}
-func (a *App) {{.MethodName}}() ({{.ServiceType}}, error) {
+func (a *App) {{.MethodName}}() (*{{.ServiceType}}, error) {
 	s, err := a.GetService("{{.ServiceName}}")
 
 	if err != nil {
 		return nil, err
 	}
 
-	srv, ok := s.({{.ServiceType}})
+	srv, ok := s.(*{{.ServiceType}})
 
 	if !ok {
 		return nil, errors.New("Incorrect service type")
@@ -107,7 +107,7 @@ import (
 )
 
 func {{.FactoryName}}Factory(ctx context.Context) (interface{}, error) {
-	return nil, nil
+	return New{{.ServiceType}}()
 }
 
 `
