@@ -10,6 +10,23 @@ mkdir ./go/src/github.com/myacc/new-app
 cd ./go/src/github.com/myacc/new-app
 
 goup-gen -pkgname github.com/myacc/new-app
+// OR with services config
+goup-gen -pkgname github.com/test/pkg -cfg services.yaml
+```
+
+services.yaml example
+```
+services:
+  - service_name: "storage"
+    factory_name: "Storage"
+    method_name: "GetStorage"
+    type_name: "*ItemStorage"
+    filename: "item_storage_factory.go"
+  - service_name: "producer"
+    factory_name: "Producer"
+    method_name: "GetProducer"
+    type_name: "EventsProducer"
+    filename: "events_producer_factory.go"
 ```
 
 Usage example:

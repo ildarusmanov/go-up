@@ -65,15 +65,31 @@ func NewApp(ctx context.Context) *App {
 	if err := a.Config().RequireKeys(requiredConfigKeys); err != nil {
 		log.Fatal(err)
 	}
-
-  {{range .Factories}}
-	if err := a.AddServiceFactory("{{.FactoryServiceName}}", {{.FactoryTypeName}}Factory); err != nil {
+{{range .Services}}
+	if err := a.AddServiceFactory("{{.ServiceName}}", {{.FactoryName}}Factory); err != nil {
 		log.Fatal(err)
 	}
-  {{end}}
-
+{{end}}
 	return a
 }
+
+{{range .Services}}
+func (a *App) {{.MethodName}}() ({{.ServiceType}}, error) {
+	s, err := a.GetService("{{.ServiceName}}")
+
+	if err != nil {
+		return nil, err
+	}
+
+	srv, ok := s.({{.ServiceType}})
+
+	if !ok {
+		return nil, errors.New("Incorrect service type")
+	}
+
+	return srv, nil
+}
+{{end}}
 
 func (a *App) Stop() {
 	log.Println("[*] Server stopped")
@@ -86,12 +102,11 @@ package app
 
 import (
 	"context"
-	"os"
 
 	"github.com/ildarusmanov/go-up/goup"
 )
 
-func {{.FactoryTypeName}}Factory(ctx context.Context) (interface{}, error) {
+func {{.FactoryName}}Factory(ctx context.Context) (interface{}, error) {
 	return nil, nil
 }
 
