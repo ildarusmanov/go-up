@@ -2,6 +2,16 @@
 
 This is a simple package to simplify Golang applications development.
 
+Generate new application with
+```
+go install -i github.com/ildarusmanov/go-up/cmd/goup-gen
+
+mkdir ./go/src/github.com/myacc/new-app
+cd ./go/src/github.com/myacc/new-app
+
+goup-gen -pkgname github.com/myacc/new-app
+```
+
 Usage example:
 
 ```
