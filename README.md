@@ -20,7 +20,7 @@ services:
   - service_name: "storage"
     factory_name: "Storage"
     method_name: "GetStorage"
-    type_name: "*ItemStorage"
+    type_name: "ItemStorage"
     filename: "item_storage_factory.go"
   - service_name: "producer"
     factory_name: "Producer"
