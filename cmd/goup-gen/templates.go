@@ -1,7 +1,6 @@
 package main
 
-const MainTemplate = `
-package main
+const MainTemplate = `package main
 
 import (
 	"context"
@@ -40,13 +39,15 @@ func main() {
 }
 `
 
-const AppTemplate = `
-package app
+const AppTemplate = `package app
 
 import (
 	"context"
 	"log"
 
+{{range .Services}}
+  "{{.ServicePackage.Import}}"
+{{end}}
 	"github.com/ildarusmanov/go-up/config"
 	"github.com/ildarusmanov/go-up/goup"
 )
@@ -72,16 +73,15 @@ func NewApp(ctx context.Context) *App {
 {{end}}
 	return a
 }
-
 {{range .Services}}
-func (a *App) {{.MethodName}}() (*{{.ServiceType}}, error) {
+func (a *App) {{.MethodName}}() (*{{.ServicePackage.Name}}.{{.ServiceType}}, error) {
 	s, err := a.GetService("{{.ServiceName}}")
 
 	if err != nil {
 		return nil, err
 	}
 
-	srv, ok := s.(*{{.ServiceType}})
+	srv, ok := s.(*{{.ServicePackage.Name}}.{{.ServiceType}})
 
 	if !ok {
 		return nil, errors.New("Incorrect service type")
@@ -90,24 +90,23 @@ func (a *App) {{.MethodName}}() (*{{.ServiceType}}, error) {
 	return srv, nil
 }
 {{end}}
-
 func (a *App) Stop() {
 	log.Println("[*] Server stopped")
 }
 
 `
 
-const FactoryTemplate = `
-package app
+const FactoryTemplate = `package app
 
 import (
 	"context"
 
+	"{{.ServicePackage.Import}}"
 	"github.com/ildarusmanov/go-up/goup"
 )
 
 func {{.FactoryName}}Factory(ctx context.Context) (interface{}, error) {
-	return New{{.ServiceType}}()
+	return {{.ServicePackage.Name}}.New{{.ServiceType}}()
 }
 
 `
