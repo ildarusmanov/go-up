@@ -21,12 +21,18 @@ services:
     factory_name: "Storage"
     method_name: "GetStorage"
     type_name: "ItemStorage"
-    filename: "item_storage_factory.go"
+    factory_filename: "item_storage_factory.go"
+		service_package:
+		  name: "pkg"
+			import: "github.com/test/pkg"
   - service_name: "producer"
     factory_name: "Producer"
     method_name: "GetProducer"
     type_name: "EventsProducer"
-    filename: "events_producer_factory.go"
+    factory_filename: "events_producer_factory.go"
+		service_package:
+		  name: "pkgname"
+			import: "github.com/test/pkgname"
 ```
 
 Usage example:

@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"log"
 	"os"
+	"os/exec"
 	"text/template"
 
 	"gopkg.in/yaml.v2"
@@ -24,8 +26,11 @@ func main() {
 	}
 
 	CreateAppDir(wdir)
+	CreateServicesDir(wdir)
 	CreateAppServices(wdir)
 	CreateMainFile(wdir)
+
+	FormatCode(wdir)
 
 	log.Println("Done!")
 }
@@ -33,6 +38,12 @@ func main() {
 func CreateAppDir(wdir string) {
 	if err := os.Mkdir(wdir+"/app", os.FileMode(0777)); err != nil {
 		log.Fatalf("Can not create app/ directory: %s", err)
+	}
+}
+
+func CreateServicesDir(wdir string) {
+	if err := os.Mkdir(wdir+"/services", os.FileMode(0777)); err != nil {
+		log.Fatalf("Can not create services/ directory: %s", err)
 	}
 }
 
@@ -55,24 +66,25 @@ func CreateAppServices(wdir string) {
 		}
 
 		for _, srv := range cfg.Services {
-			CreateAppService(wdir, srv)
+			CreateAppServiceFactory(wdir, srv)
 		}
 	}
 }
 
-func CreateAppService(wdir string, srv *ServiceFactory) {
+func CreateAppServiceFactory(wdir string, srv *ServiceFactory) {
 	factoryTmpl := template.Must(template.New("factory").Parse(FactoryTemplate))
-	srvFName := wdir + "/app/" + srv.Filename
-	srvFile, err := os.Create(srvFName)
+	factoryName := wdir + "/app/" + srv.FactoryFilename
+	factoryFile, err := os.Create(factoryName)
 
 	if err != nil {
-		log.Printf("Can not create service file %s: %s\n", srvFName, err)
+		log.Printf("Can not create factory file %s: %s\n", factoryName, err)
 		return
 	}
 
-	if err := factoryTmpl.Execute(srvFile, srv); err != nil {
-		log.Printf("Can not create factory %s: %s", srvFName, err)
+	if err := factoryTmpl.Execute(factoryFile, srv); err != nil {
+		log.Printf("Can not create factory %s: %s", factoryName, err)
 	}
+
 }
 
 func CreateMainFile(wdir string) {
@@ -106,4 +118,16 @@ func ParseConfigYaml(servicesYamlFile string) (*ServicesConfig, error) {
 	}
 
 	return cfg, nil
+}
+
+func FormatCode(wdir string) {
+	cmd := exec.Command("go", "fmt", wdir+"/...")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+
+	if err := cmd.Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("in all caps: %q\n", out.String())
 }
