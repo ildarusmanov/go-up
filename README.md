@@ -6,16 +6,19 @@ Generate new application with
 ```
 go install -i github.com/ildarusmanov/go-up/cmd/goup-gen
 
-mkdir ./go/src/github.com/myacc/new-app
-cd ./go/src/github.com/myacc/new-app
+// 1. create new project
+// goup-gen init [directory bane] [package name]
+goup-gen init new-app github.com/myacc/new-app
 
-goup-gen -pkgname github.com/myacc/new-app
-// OR with services config
-goup-gen -pkgname github.com/test/pkg -cfg services.yaml
+// 2. UPDATE .goup.yml
+
+// 3. Update project according to .goup.yml
+goup-gen init
 ```
 
 services.yaml example
 ```
+pkgname: "github.com/myacc/new-app"
 services:
   - service_name: "storage"
     factory_name: "Storage"
