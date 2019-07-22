@@ -15,5 +15,13 @@ type ServiceFactory struct {
 }
 
 type ServicesConfig struct {
+	Pkgname  string            `yaml:"pkgname,omitempty"`
 	Services []*ServiceFactory `yaml:"services,omitempty"`
+}
+
+func NewServicesConfig(pkgname string) *ServicesConfig {
+	return &ServicesConfig{
+		Pkgname:  pkgname,
+		Services: []*ServiceFactory{},
+	}
 }
