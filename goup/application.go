@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/ildarusmanov/go-up/config"
-	"github.com/ildarusmanov/go-up/dependencies"
 )
 
 // Factory builds a service
@@ -24,40 +23,17 @@ type ConfigManager interface {
 	RequireKeys([]string) error
 }
 
-type DependenciesManager interface {
-	Add(name string, service interface{})
-	Get(name string) (interface{}, error)
-}
-
 type Application struct {
-	ctx  context.Context
-	cfg  ConfigManager
-	deps DependenciesManager
+	ctx context.Context
+	cfg ConfigManager
 }
 
 // Creates new application
 func NewApplication() *Application {
 	return &Application{
-		ctx:  context.Background(),
-		deps: dependencies.NewDependencies(),
-		cfg:  config.NewConfig(),
+		ctx: context.Background(),
+		cfg: config.NewConfig(),
 	}
-}
-
-// Set dependency manager
-func (a *Application) WithDependencies(d DependenciesManager) *Application {
-	if d == nil {
-		log.Fatalf("WithDependencies(%v) failed", d)
-	}
-
-	a.deps = d
-
-	return a
-}
-
-// Get dependency manager
-func (a *Application) Dependencies() DependenciesManager {
-	return a.deps
 }
 
 // Set config manager
@@ -86,26 +62,6 @@ func (a *Application) WithContext(ctx context.Context) *Application {
 // Get current context
 func (a *Application) Context() context.Context {
 	return a.ctx
-}
-
-// Add new service factory and create a service with it
-func (a *Application) AddServiceFactory(srvName string, f ServiceFactory) error {
-	ctx := context.WithValue(a.Context(), "Application", a)
-
-	s, err := f(ctx)
-
-	if err != nil {
-		return err
-	}
-
-	a.Dependencies().Add(srvName, s)
-
-	return nil
-}
-
-// Find service by name
-func (a *Application) GetService(srvName string) (interface{}, error) {
-	return a.Dependencies().Get(srvName)
 }
 
 // Check config with keys

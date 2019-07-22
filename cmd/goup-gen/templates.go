@@ -17,25 +17,18 @@ func main() {
 	log.Println("[+] Starting")
 
 	sigchan := make(chan os.Signal, 1)
-
 	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
 
 	ctx, cancel := context.WithCancel(context.Background())
 
 	a := app.NewApp(ctx)
-
 	log.Println("[*] Started")
 
 	<-sigchan
-
-	a.Stop()
 	cancel()
 
 	time.Sleep(time.Second * 5)
-
 	log.Println("[x] Finished")
-
-	os.Exit(0)
 }
 `
 
@@ -66,34 +59,46 @@ func NewApp(ctx context.Context) *App {
 	if err := a.Config().RequireKeys(requiredConfigKeys); err != nil {
 		log.Fatal(err)
 	}
+
+	// create services
+  {
 {{range .Services}}
-	if err := a.AddServiceFactory("{{.ServiceName}}", {{.FactoryName}}Factory); err != nil {
-		log.Fatal(err)
-	}
+		c{{.FactoryName}}, err := {{.FactoryName}}FactoryConfigGetter(a.Config())
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		s{{.FactoryName}}, err := {{.FactoryName}}Factory(
+			ctx,
+			c,{{range .Dependencies}}s{{.FactoryName}},
 {{end}}
+		)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+{{end}}
+  }
+
+	// stop the application
+	go func(){
+		for {
+			select {
+			case <-ctx.Done():
+				log.Print("[x] Stop application")
+				// add services handlers
+				// e.g.: someService.Close()
+				// ...
+				return
+			default:
+				continue;
+			}
+		}
+	}()
+
 	return a
 }
-{{range .Services}}
-func (a *App) {{.MethodName}}() (*{{.ServicePackage.Name}}.{{.ServiceType}}, error) {
-	s, err := a.GetService("{{.ServiceName}}")
-
-	if err != nil {
-		return nil, err
-	}
-
-	srv, ok := s.(*{{.ServicePackage.Name}}.{{.ServiceType}})
-
-	if !ok {
-		return nil, errors.New("Incorrect service type")
-	}
-
-	return srv, nil
-}
-{{end}}
-func (a *App) Stop() {
-	log.Println("[*] Server stopped")
-}
-
 `
 
 const FactoryTemplate = `package app
@@ -102,11 +107,30 @@ import (
 	"context"
 
 	"{{.ServicePackage.Import}}"
+{{range .Dependencies}}
+  "{{.DependencyPackage.Import}}"
+{{end}}
 	"github.com/ildarusmanov/go-up/goup"
 )
 
-func {{.FactoryName}}Factory(ctx context.Context) (interface{}, error) {
-	return {{.ServicePackage.Name}}.New{{.ServiceType}}()
+type {{.FactoryName}}FactoryConfig struct{}
+
+func {{.FactoryName}}FactoryConfigGetter(cfg goup.ConfigManager) ({{.FactoryName}}FactoryConfig, error) {
+	return &{{.FactoryName}}FactoryConfig{}, nil
+}
+
+func {{.FactoryName}}Factory(
+	ctx context.Context,
+	cfg goup.ConfigManager,{{range .Dependencies}}s{{.FactoryName}} {{.Type}},
+{{end}}
+) ({{.ServiceType}}, error) {
+	if fcfg, err := {{.FactoryName}}FactoryConfigGetter(cfg goup.ConfigManager); err != nil {
+		return nil, err
+	}
+
+	// create service with type {{.ServiceType}}
+
+	return nil, nil
 }
 
 `

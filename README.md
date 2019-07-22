@@ -20,19 +20,13 @@ services.yaml example
 ```
 pkgname: "github.com/myacc/new-app"
 services:
-  - service_name: "storage"
-    factory_name: "Storage"
-    method_name: "GetStorage"
-    type_name: "ItemStorage"
-    factory_filename: "item_storage_factory.go"
+  - factory_name: "Storage"
+    type_name: "pkg.ItemStorage"
 		service_package:
 		  name: "pkg"
 			import: "github.com/test/pkg"
-  - service_name: "producer"
-    factory_name: "Producer"
-    method_name: "GetProducer"
-    type_name: "EventsProducer"
-    factory_filename: "events_producer_factory.go"
+  - factory_name: "Producer"
+    type_name: "pkgname.EventsProducer"
 		service_package:
 		  name: "pkgname"
 			import: "github.com/test/pkgname"

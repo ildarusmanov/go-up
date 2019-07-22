@@ -37,7 +37,7 @@ func createAppServices(wdir string) {
 
 func createAppServiceFactory(wdir string, srv *ServiceFactory) {
 	factoryTmpl := template.Must(template.New("factory").Parse(FactoryTemplate))
-	factoryName := wdir + "/app/" + srv.FactoryFilename
+	factoryName := wdir + "/app/" + srv.FactoryFilename()
 	factoryFile, err := os.Create(factoryName)
 
 	if err != nil {
