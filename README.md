@@ -13,7 +13,7 @@ goup-gen init new-app github.com/myacc/new-app
 // 2. UPDATE .goup.yml
 
 // 3. Update project according to .goup.yml
-goup-gen init
+goup-gen update
 ```
 
 services.yaml example
