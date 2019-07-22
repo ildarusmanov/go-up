@@ -71,8 +71,8 @@ func NewApp(ctx context.Context) *App {
 
 		s{{.FactoryName}}, err := {{.FactoryName}}Factory(
 			ctx,
-			c,{{range .Dependencies}}s{{.FactoryName}},
-{{end}}
+			c,{{range .Dependencies}}
+			s{{.FactoryName}},{{end}}
 		)
 
 		if err != nil {
@@ -121,8 +121,8 @@ func {{.FactoryName}}FactoryConfigGetter(cfg goup.ConfigManager) ({{.FactoryName
 
 func {{.FactoryName}}Factory(
 	ctx context.Context,
-	cfg goup.ConfigManager,{{range .Dependencies}}s{{.FactoryName}} {{.Type}},
-{{end}}
+	cfg goup.ConfigManager,{{range .Dependencies}}
+	s{{.FactoryName}} {{.Type}},{{end}}
 ) ({{.ServiceType}}, error) {
 	if fcfg, err := {{.FactoryName}}FactoryConfigGetter(cfg goup.ConfigManager); err != nil {
 		return nil, err
