@@ -14,19 +14,17 @@ import (
 
 var _ = Describe("Application", func() {
 	var (
-		a            *Application
-		ctx          context.Context
-		mockCtrl     *gomock.Controller
-		config       *mock_goup.MockConfigManager
-		dependencies *mock_goup.MockDependenciesManager
+		a        *Application
+		ctx      context.Context
+		mockCtrl *gomock.Controller
+		config   *mock_goup.MockConfigManager
 	)
 
 	BeforeEach(func() {
 		mockCtrl = gomock.NewController(GinkgoT())
 		config = mock_goup.NewMockConfigManager(mockCtrl)
-		dependencies = mock_goup.NewMockDependenciesManager(mockCtrl)
 		ctx = context.WithValue(context.Background(), "k", "v")
-		a = NewApplication().WithDependencies(dependencies).WithConfig(config).WithContext(ctx)
+		a = NewApplication().WithConfig(config).WithContext(ctx)
 	})
 
 	AfterEach(func() {
@@ -38,36 +36,6 @@ var _ = Describe("Application", func() {
 	})
 
 	Describe("methods", func() {
-		Describe(".AddServiceFactory(), .GetService()", func() {
-			var (
-				name    string
-				factory func(context.Context) (interface{}, error)
-				service string
-			)
-
-			BeforeEach(func() {
-				name = "service_name"
-
-				service = "service 123"
-
-				factory = func(ctx context.Context) (interface{}, error) {
-					return service, nil
-				}
-			})
-
-			It("should add service", func() {
-				dependencies.EXPECT().Add(name, service).AnyTimes()
-				dependencies.EXPECT().Get(name).Return(service, nil).AnyTimes()
-
-				err := a.AddServiceFactory(name, factory)
-				s, getErr := a.GetService(name)
-
-				Expect(err).To(BeNil())
-				Expect(getErr).To(BeNil())
-				Expect(s.(string)).To(Equal(service))
-			})
-		})
-
 		Describe(".RequireConfig(), .SetConfig(), .UnsetConfg(), .GetConfig(), .GetConfigString()", func() {
 			var (
 				key, val string
