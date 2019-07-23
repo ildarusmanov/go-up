@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"strings"
 )
 
@@ -42,11 +43,13 @@ func (cfg *ServicesConfig) AddService(serviceFactory *ServiceFactory) {
 	cfg.Services = append(cfg.Services, serviceFactory)
 }
 
-func (cfg *ServicesConfig) DropService(factoryName string) {
+func (cfg *ServicesConfig) DropService(wdir, factoryName string) {
 	newServices := []*ServiceFactory{}
 
 	for _, v := range cfg.Services {
 		if v.FactoryName == factoryName {
+			os.Remove(wdir + "/app/" + v.FactoryFilename())
+
 			continue
 		}
 
