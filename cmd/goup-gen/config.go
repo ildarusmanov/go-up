@@ -37,3 +37,21 @@ func NewServicesConfig(pkgname string) *ServicesConfig {
 		Services: []*ServiceFactory{},
 	}
 }
+
+func (cfg *ServicesConfig) AddService(serviceFactory *ServiceFactory) {
+	cfg.Services = append(cfg.Services, serviceFactory)
+}
+
+func (cfg *ServicesConfig) DropService(factoryName string) {
+	newServices := []*ServiceFactory{}
+
+	for _, v := range cfg.Services {
+		if v.FactoryName == factoryName {
+			continue
+		}
+
+		newServices = append(newServices, v)
+	}
+
+	cfg.Services = newServices
+}

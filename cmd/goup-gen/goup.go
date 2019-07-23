@@ -21,6 +21,10 @@ func main() {
 		InitCommand(wdir)
 	case "update":
 		UpdateCommand(wdir)
+	case "add_factory":
+		AddFactoryCommand(wdir)
+	case "drop_factory":
+		DropFactoryCommand(wdir)
 	default:
 		log.Printf("Invalid command")
 	}

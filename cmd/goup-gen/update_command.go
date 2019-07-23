@@ -4,8 +4,6 @@ import (
 	"log"
 	"os"
 	"text/template"
-
-	yaml "gopkg.in/yaml.v3"
 )
 
 func UpdateCommand(wdir string) {
@@ -49,24 +47,4 @@ func createAppServiceFactory(wdir string, srv *ServiceFactory) {
 		log.Printf("Can not create factory %s: %s", factoryName, err)
 	}
 
-}
-
-func parseConfigYaml(servicesYamlFile string) (*ServicesConfig, error) {
-	f, err := os.Open(servicesYamlFile)
-
-	if err != nil {
-		log.Printf("Can not open servces config file %s: %s\n", servicesYamlFile, err)
-		return nil, err
-	}
-
-	d := yaml.NewDecoder(f)
-
-	cfg := &ServicesConfig{}
-
-	if err := d.Decode(cfg); err != nil {
-		log.Printf("Can not parse services config %s: %s\n", servicesYamlFile, err)
-		return nil, err
-	}
-
-	return cfg, nil
 }
