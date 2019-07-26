@@ -19,7 +19,7 @@ func AddFactoryCommand(wdir string) {
 	factoryName := flag.Arg(1)
 	serviceType := flag.Arg(2)
 
-	cfg.AddService(&ServiceFactory{
+	cfg.AddFactory(&Factory{
 		FactoryName: factoryName,
 		ServiceType: serviceType,
 	})

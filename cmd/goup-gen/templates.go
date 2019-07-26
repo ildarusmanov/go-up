@@ -39,8 +39,8 @@ import (
 	"context"
 	"log"
 
-{{range .Services}}
-  "{{.ServicePackage.Import}}"
+{{range .Factories}}
+  "{{.ServicePackage.GetDefinition}}"
 {{end}}
 	"github.com/ildarusmanov/go-up/config"
 	"github.com/ildarusmanov/go-up/goup"
@@ -57,7 +57,7 @@ func StartApplication(ctx context.Context) goup.StopApplicationHandler {
 
 	// create services
   {
-{{range .Services}}
+{{range .Factories}}
 		c{{.FactoryName}}, err := {{.FactoryName}}FactoryConfigGetter(cfg)
 
 		if err != nil {
@@ -90,9 +90,9 @@ const FactoryTemplate = `package app
 import (
 	"context"
 
-	"{{.ServicePackage.Import}}"
+	{{.ServicePackage.GetDefinition}}
 {{range .Dependencies}}
-  "{{.DependencyPackage.Import}}"
+  "{{.DependencyPackage.GetDefinition}}"
 {{end}}
 	"github.com/ildarusmanov/go-up/goup"
 )
@@ -114,7 +114,7 @@ func {{.FactoryName}}Factory(
 
 	// create service with type {{.ServiceType}}
 
-	return nil, nil
+	return {{.ServiceConstructor.Signature}}
 }
 
 `

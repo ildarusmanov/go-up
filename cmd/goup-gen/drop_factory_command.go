@@ -18,7 +18,7 @@ func DropFactoryCommand(wdir string) {
 
 	factoryName := flag.Arg(1)
 
-	cfg.DropService(factoryName)
+	cfg.DropFactory(wdir, factoryName)
 
 	cfgFile, err := os.Create(servicesYamlFile)
 

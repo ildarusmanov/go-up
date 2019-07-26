@@ -28,12 +28,12 @@ func createAppServices(wdir string) {
 		log.Printf("Can not create app/app.go: %s", err)
 	}
 
-	for _, srv := range cfg.Services {
-		createAppServiceFactory(wdir, srv)
+	for _, srv := range cfg.Factories {
+		createAppFactory(wdir, srv)
 	}
 }
 
-func createAppServiceFactory(wdir string, srv *ServiceFactory) {
+func createAppFactory(wdir string, srv *Factory) {
 	factoryTmpl := template.Must(template.New("factory").Parse(FactoryTemplate))
 	factoryName := wdir + "/app/" + srv.FactoryFilename()
 	factoryFile, err := os.Create(factoryName)
