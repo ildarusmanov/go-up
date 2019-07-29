@@ -21,11 +21,12 @@ func main() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	a := app.NewApp(ctx)
+	stopApplication := app.StartApplication(ctx)
 	log.Println("[*] Started")
 
 	<-sigchan
 	cancel()
+	stopApplication()
 
 	time.Sleep(time.Second * 5)
 	log.Println("[x] Finished")
@@ -38,32 +39,26 @@ import (
 	"context"
 	"log"
 
-{{range .Services}}
-  "{{.ServicePackage.Import}}"
+{{range .Factories}}
+  {{.ServicePackage.GetDefinition}}
 {{end}}
 	"github.com/ildarusmanov/go-up/config"
 	"github.com/ildarusmanov/go-up/goup"
 )
 
-type App struct {
-	*goup.Application
-}
-
-func NewApp(ctx context.Context) *App {
-	a := &App{Application: goup.NewApplication()}
-
-	a.WithContext(ctx).WithConfig(config.NewEnvConfig())
+func StartApplication(ctx context.Context) goup.StopApplicationHandler {
+	cfg := config.NewEnvConfig()
 
 	requiredConfigKeys := []string{}
 
-	if err := a.Config().RequireKeys(requiredConfigKeys); err != nil {
+	if err := cfg.RequireKeys(requiredConfigKeys); err != nil {
 		log.Fatal(err)
 	}
 
 	// create services
   {
-{{range .Services}}
-		c{{.FactoryName}}, err := {{.FactoryName}}FactoryConfigGetter(a.Config())
+{{range .Factories}}
+		c{{.FactoryName}}, err := {{.FactoryName}}FactoryConfigGetter(cfg)
 
 		if err != nil {
 			log.Fatal(err)
@@ -82,22 +77,11 @@ func NewApp(ctx context.Context) *App {
   }
 
 	// stop the application
-	go func(){
-		for {
-			select {
-			case <-ctx.Done():
-				log.Print("[x] Stop application")
-				// add services handlers
-				// e.g.: someService.Close()
-				// ...
-				return
-			default:
-				continue;
-			}
-		}
-	}()
-
-	return a
+	return func(){
+		log.Println("[x] Terminating...")
+		// add code here
+		log.Println("[x] Done")
+	}
 }
 `
 
@@ -106,9 +90,9 @@ const FactoryTemplate = `package app
 import (
 	"context"
 
-	"{{.ServicePackage.Import}}"
+	{{.ServicePackage.GetDefinition}}
 {{range .Dependencies}}
-  "{{.DependencyPackage.Import}}"
+  {{.DependencyPackage.GetDefinition}}
 {{end}}
 	"github.com/ildarusmanov/go-up/goup"
 )
@@ -130,7 +114,7 @@ func {{.FactoryName}}Factory(
 
 	// create service with type {{.ServiceType}}
 
-	return nil, nil
+	return {{.ServiceConstructor.Signature}}
 }
 
 `
