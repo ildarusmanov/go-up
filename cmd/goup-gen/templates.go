@@ -40,7 +40,7 @@ import (
 	"log"
 
 {{range .Factories}}
-  "{{.ServicePackage.GetDefinition}}"
+  {{.ServicePackage.GetDefinition}}
 {{end}}
 	"github.com/ildarusmanov/go-up/config"
 	"github.com/ildarusmanov/go-up/goup"
@@ -92,7 +92,7 @@ import (
 
 	{{.ServicePackage.GetDefinition}}
 {{range .Dependencies}}
-  "{{.DependencyPackage.GetDefinition}}"
+  {{.DependencyPackage.GetDefinition}}
 {{end}}
 	"github.com/ildarusmanov/go-up/goup"
 )
