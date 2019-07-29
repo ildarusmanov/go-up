@@ -108,7 +108,7 @@ func {{.FactoryName}}Factory(
 	cfg goup.ConfigManager,{{range .Dependencies}}
 	s{{.FactoryName}} {{.Type}},{{end}}
 ) ({{.ServiceType}}, error) {
-	if fcfg, err := {{.FactoryName}}FactoryConfigGetter(cfg goup.ConfigManager); err != nil {
+	if fcfg, err := {{.FactoryName}}FactoryConfigGetter(cfg); err != nil {
 		return nil, err
 	}
 
