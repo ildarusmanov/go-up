@@ -58,12 +58,6 @@ func StartApplication(ctx context.Context) goup.StopApplicationHandler {
 	// create services
   {
 {{range .Factories}}
-		c{{.FactoryName}}, err := {{.FactoryName}}FactoryConfigGetter(cfg)
-
-		if err != nil {
-			log.Fatal(err)
-		}
-
 		s{{.FactoryName}}, err := {{.FactoryName}}Factory(
 			ctx,
 			c,{{range .Dependencies}}
