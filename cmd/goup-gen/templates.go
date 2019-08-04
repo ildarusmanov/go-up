@@ -56,11 +56,10 @@ func StartApplication(ctx context.Context) goup.StopApplicationHandler {
 	}
 
 	// create services
-  {
 {{range .Factories}}
 		s{{.FactoryName}}, err := {{.FactoryName}}Factory(
 			ctx,
-			c,{{range .Dependencies}}
+			cfg,{{range .Dependencies}}
 			s{{.FactoryName}},{{end}}
 		)
 
@@ -68,7 +67,6 @@ func StartApplication(ctx context.Context) goup.StopApplicationHandler {
 			log.Fatal(err)
 		}
 {{end}}
-  }
 
 	// stop the application
 	return func(){
@@ -88,21 +86,30 @@ import (
 {{range .Dependencies}}
   {{.DependencyPackage.GetDefinition}}
 {{end}}
+{{range .Imports}}
+  {{.GetDefinition}}
+{{end}}
 	"github.com/ildarusmanov/go-up/goup"
 )
 
-type {{.FactoryName}}FactoryConfig struct{}
+type {{.FactoryName}}FactoryConfig struct{
+{{range .GetFactoryConfigFields}}
+	{{.Name}} {{.Type}}
+{{end}}
+}
 
-func {{.FactoryName}}FactoryConfigGetter(cfg goup.ConfigManager) ({{.FactoryName}}FactoryConfig, error) {
+func {{.FactoryName}}FactoryConfigGetter(cfg goup.ConfigManager) (*{{.FactoryName}}FactoryConfig, error) {
 	return &{{.FactoryName}}FactoryConfig{}, nil
 }
 
 func {{.FactoryName}}Factory(
 	ctx context.Context,
 	cfg goup.ConfigManager,{{range .Dependencies}}
-	s{{.FactoryName}} {{.Type}},{{end}}
+	d{{.FactoryName}} {{.Type}},{{end}}
 ) ({{.ServiceType}}, error) {
-	if fcfg, err := {{.FactoryName}}FactoryConfigGetter(cfg); err != nil {
+	fcfg, err := {{.FactoryName}}FactoryConfigGetter(cfg)
+
+	if err != nil {
 		return nil, err
 	}
 

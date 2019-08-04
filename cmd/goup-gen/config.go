@@ -25,15 +25,34 @@ type Dependency struct {
 }
 
 type Factory struct {
-	FactoryName        string             `yaml:"factory_name,omitempty"`
-	ServiceType        string             `yaml:"type_name,omitempty"`
-	ServicePackage     *PackageDefinition `yaml:"service_package,omitempty"`
-	ServiceConstructor *Constructor       `yaml:"service_constructor,omitempty"`
-	Dependencies       []*Dependency      `yaml:"dependencies,omitempty"`
+	FactoryName        string               `yaml:"factory_name,omitempty"`
+	ServiceType        string               `yaml:"type_name,omitempty"`
+	ServicePackage     *PackageDefinition   `yaml:"service_package,omitempty"`
+	ServiceConstructor *Constructor         `yaml:"service_constructor,omitempty"`
+	Dependencies       []*Dependency        `yaml:"dependencies,omitempty"`
+	Imports            []*PackageDefinition `yaml:"imports,omitempty"`
+	FactoryConfig      *FactoryConfig       `yaml:"factory_config,omitempty"`
+}
+
+type FactoryConfig struct {
+	Fields []*FactoryConfigField `yaml:"fields,omitempty"`
+}
+
+type FactoryConfigField struct {
+	Name string `yaml:"name,omitempty"`
+	Type string `yaml:"type,omitempty"`
 }
 
 type Constructor struct {
 	Signature string `yaml:"signature,omitempty"`
+}
+
+func (s *Factory) GetFactoryConfigFields() []*FactoryConfigField {
+	if s.FactoryConfig == nil {
+		return []*FactoryConfigField{}
+	}
+
+	return s.FactoryConfig.Fields
 }
 
 func (s *Factory) FactoryFilename() string {
