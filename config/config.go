@@ -5,6 +5,11 @@ import (
 	"log"
 )
 
+var (
+	ErrUndefinedKey         = errors.New("undefined key")
+	ErrRequiredKeysNotFound = errors.New("can not find required config keys")
+)
+
 type Config struct {
 	values map[string]interface{}
 }
@@ -21,7 +26,7 @@ func (c *Config) Set(key string, value interface{}) {
 
 func (c *Config) Unset(key string) error {
 	if _, ok := c.values[key]; !ok {
-		return errors.New("Undefined key")
+		return ErrUndefinedKey
 	}
 
 	delete(c.values, key)
@@ -59,7 +64,7 @@ func (c *Config) RequireKeys(keys []string) error {
 	}
 
 	if hasErrors {
-		return errors.New("Required keys does not exist in config")
+		return ErrRequiredKeysNotFound
 	}
 
 	return nil

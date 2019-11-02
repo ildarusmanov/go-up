@@ -1,0 +1,37 @@
+package app
+
+import (
+	"context"
+	"net/http"
+	"time"
+
+	"github.com/rs/zerolog/log"
+	googlegrpc "google.golang.org/grpc"
+)
+
+type RestartSignal struct {}
+
+type Application struct {
+	Ctx        context.Context
+  RestartCh  chan RestartSignal{}
+}
+
+func (a *Application) Restart() error {
+  if err := a.Stop(); err != nil {
+    return err
+  }
+
+  return a.Start()
+}
+
+func (a *Application) Start() error {
+  // do something
+
+  return nil
+}
+
+func (a *Application)  Stop() error {
+  // do somethings
+
+  return nil
+}

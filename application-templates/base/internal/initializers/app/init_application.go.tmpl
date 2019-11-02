@@ -1,0 +1,21 @@
+//+build wireinject
+
+//go:generate wire
+
+package app
+
+import (
+	"context"
+
+	"github.com/google/wire"
+	"github.com/ildarusmanov/go-up/config"
+	"github.com/ildarusmanov/go-up/goup"
+)
+
+func InitApplication(ctx context.Context, RestartCh  chan RestartSignal{}) (*Application, error) {
+	wire.Build(
+		wire.Struct(new(Application), "Ctx", "RestartCh"),
+	)
+
+	return nil, nil
+}
