@@ -8,7 +8,10 @@ import (
 )
 
 const (
+	DefaultGoupDir             = "~/.go-up"
+	DefaultTemplatesDir        = "~/.go-up/templates"
 	DefaultTemplatesConfigPath = "~/.go-up/templates-config.yml"
+	TemplatesDirEnv            = "GOUP_TEMPLATES_DIR"
 	TemplatesConfigPathEnv     = "GOUP_TEMPLATES_CONFIG_PATH"
 )
 
@@ -22,11 +25,10 @@ type TemplateConfigVarValue struct {
 }
 
 type TemplateConfig struct {
-	GoupConfig           *GoupConfig                        `yaml:"_"`
-	DestinationDirectory string                             `yaml:"destination_directory"`
-	BeforeScript         string                             `yaml:"before_script"`
-	AfterScript          string                             `yaml:"after_script"`
-	Vars                 map[string]*TemplateConfigVarValue `yaml:"vars"`
+	GoupConfig   *GoupConfig                        `yaml:"_"`
+	BeforeScript string                             `yaml:"before_script"`
+	AfterScript  string                             `yaml:"after_script"`
+	Vars         map[string]*TemplateConfigVarValue `yaml:"vars"`
 }
 
 type TemplatesConfig struct {
@@ -130,14 +132,14 @@ func getDirPath(wdir, relativePath string) (string, error) {
 		return wdir + "/" + relativePath, nil
 	}
 
-	envd, ok := os.LookupEnv(TemplatesConfigPathEnv)
+	envd, ok := os.LookupEnv(TemplatesDirEnv)
 
 	if ok && isFileExists(envd+"/"+relativePath) {
 		return envd + "/" + relativePath, nil
 	}
 
-	if isFileExists(DefaultTemplatesConfigPath + "/" + relativePath) {
-		return DefaultTemplatesConfigPath + "/" + relativePath, nil
+	if isFileExists(DefaultTemplatesDir + "/" + relativePath) {
+		return DefaultTemplatesDir + "/" + relativePath, nil
 	}
 
 	return "", fmt.Errorf("can not find the file: %s", relativePath)
@@ -148,14 +150,14 @@ func getFilePath(wdir, relativePath string) (string, error) {
 		return wdir + "/" + relativePath, nil
 	}
 
-	envd, ok := os.LookupEnv(TemplatesConfigPathEnv)
+	envd, ok := os.LookupEnv(TemplatesDirEnv)
 
 	if ok && isDirExists(envd+"/"+relativePath) {
 		return envd + "/" + relativePath, nil
 	}
 
-	if isDirExists(DefaultTemplatesConfigPath + "/" + relativePath) {
-		return DefaultTemplatesConfigPath + "/" + relativePath, nil
+	if isDirExists(DefaultTemplatesDir + "/" + relativePath) {
+		return DefaultTemplatesDir + "/" + relativePath, nil
 	}
 
 	return "", fmt.Errorf("can not find the file: %s", relativePath)
