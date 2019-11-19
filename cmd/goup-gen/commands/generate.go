@@ -4,6 +4,7 @@ import (
 	"errors"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/ildarusmanov/go-up/internal/config"
 	"github.com/ildarusmanov/go-up/internal/files"
@@ -18,8 +19,8 @@ var (
 
 func NewGenerateCommand() (*cobra.Command, func()) {
 	cmd := &cobra.Command{
-		Use:   "generate [template name]",
-		Short: "Generate new item by template",
+		Use:   "generate [template name] [destination name]",
+		Short: "Generate new item by template with name",
 		Long:  ``,
 		Args:  cobra.MinimumNArgs(1),
 		Run:   runGenerateCmd,
@@ -29,8 +30,8 @@ func NewGenerateCommand() (*cobra.Command, func()) {
 }
 
 func runGenerateCmd(cmd *cobra.Command, args []string) {
-	if len(args) < 1 {
-		log.Fatal("Please, enter a template name")
+	if len(args) < 2 {
+		log.Fatal("Please, enter a template name and destination name")
 	}
 
 	wd, err := os.Getwd()
@@ -40,8 +41,9 @@ func runGenerateCmd(cmd *cobra.Command, args []string) {
 	}
 
 	tname := args[0]
+	dname := args[1]
 
-	generateNewItem(tname, wd)
+	generateNewItem(tname, dname, wd)
 }
 
 func initGenerateCmd(cmd *cobra.Command) func() {
@@ -51,7 +53,7 @@ func initGenerateCmd(cmd *cobra.Command) func() {
 	}
 }
 
-func generateNewItem(tname, wdir string) {
+func generateNewItem(tname, dname, wdir string) {
 	goupCfg, err := config.LoadGoupConfig(*generateCmdArgCfgDir)
 
 	if err != nil {
@@ -76,8 +78,8 @@ func generateNewItem(tname, wdir string) {
 		log.Fatal(err)
 	}
 
-	createDirs(wdir, tdir)
-	createTplFiles(tcfg, wdir, tdir)
+	createDirs(wdir, tdir, dname)
+	createTplFiles(tcfg, wdir, tdir, dname)
 }
 
 func getTemplateConfig(
@@ -100,7 +102,7 @@ func getTemplateConfig(
 	return nil, ErrTemplateNotFound
 }
 
-func createDirs(pdir, tdir string) {
+func createDirs(pdir, tdir, dname string) {
 	dirs, err := files.GetFoldersPathsList(tdir)
 
 	if err != nil {
@@ -109,7 +111,8 @@ func createDirs(pdir, tdir string) {
 
 	for _, dir := range dirs {
 		if err := os.Mkdir(pdir+"/"+dir, os.FileMode(0777)); err != nil {
-			log.Fatalf("Can not create %s: %s", dir, err)
+
+			log.Fatalf("Can not create %s: %s", strings.ReplaceAll(dir, "{name}", dname), err)
 		}
 
 		log.Printf("New directory %s successfully created", dir)
@@ -118,8 +121,12 @@ func createDirs(pdir, tdir string) {
 	log.Printf("Directories are created")
 }
 
-func createTplFiles(payload interface{}, pdir, tdir string) {
+func createTplFiles(payload interface{}, pdir, tdir, dname string) {
 	tpls, err := files.GetTemplatesPathsList(tdir)
+
+	for i, tname := range tpls {
+		tpls[i] = strings.ReplaceAll(tname, "{name}", dname)
+	}
 
 	if err != nil {
 		log.Fatal(err)
