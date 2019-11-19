@@ -42,11 +42,11 @@ func initInitCmd(cmd *cobra.Command) func() {
 
 // runInitCmd runs Init command
 func runInitCmd(cmd *cobra.Command, args []string) {
-	wd, err := os.Getwd()
-
 	if len(args) < 1 {
 		log.Fatalf("please, enter a new project name")
 	}
+
+	wd, err := os.Getwd()
 
 	if err != nil {
 		log.Fatalf("can not detect current directory: %s", err.Error())
@@ -79,7 +79,7 @@ func createNewProject(pname, tdir, wdir string) {
 }
 
 func createGoupConfigFile(pkg, pdir string) *config.GoupConfig {
-	fpath := pdir + "/" + GoupConfigFile
+	fpath := pdir + "/" + config.GoupConfigFileName
 
 	cfgFile, err := os.Create(fpath)
 

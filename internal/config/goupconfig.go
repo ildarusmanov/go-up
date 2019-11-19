@@ -7,6 +7,10 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
+const (
+	GoupConfigFileName = ".goup.yml"
+)
+
 type GoupConfig struct {
 	Pkgname string `yaml:"pkgname,omitempty"`
 	Version string `yaml:"pkgname,omitempty"`
@@ -18,7 +22,9 @@ func NewGoupConfig(pkgname string) *GoupConfig {
 	}
 }
 
-func parseConfigYaml(yamlFile string) (*GoupConfig, error) {
+func LoadGoupConfig(pdir string) (*GoupConfig, error) {
+	yamlFile := pdir + "/" + GoupConfigFileName
+
 	f, err := os.Open(yamlFile)
 
 	if err != nil {
