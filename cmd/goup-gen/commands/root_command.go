@@ -13,12 +13,18 @@ func NewRootCmd() *cobra.Command {
 	}
 
 	initCmd, initCmdInit := NewInitCommand()
+	generateCmd, initGenerateCmd := NewGenerateCommand()
+	installCmd, initInstallCmd := NewInstallCommand()
 
 	// run commands initializers
 	initCmdInit()
+	initGenerateCmd()
+	initInstallCmd()
 
 	// add commands
 	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(generateCmd)
+	rootCmd.AddCommand(installCmd)
 
 	return rootCmd
 }
