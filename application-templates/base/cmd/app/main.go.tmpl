@@ -1,0 +1,62 @@
+package main
+
+import (
+	"context"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
+
+  "github.com/rs/zerolog/log"
+	"{{.Pkgname}}/internal/initializers/app"
+)
+
+func main() {
+	log.Info().Msg("Initialization..")
+
+	msgCh := make(chan app.RestartSignal)
+	sigchan := make(chan os.Signal, 1)
+	signal.Notify(sigchan, syscall.SIGINT, syscall.SIGTERM)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	a, err := app.InitApplication(ctx)
+
+	if err != nil {
+		log.Error().Err(err).Msg("Initialization error")
+		os.Exit(1)
+	}
+  log.Info().Msg("Initialized")
+
+  log.Info().Msg("Starting...")
+	if err := a.Start(); err != nil {
+		log.Error().Err(err).Msg("Starting error")
+		os.Exit(1)
+	}
+
+	log.Info().Msg("Started")
+
+	for {
+		select {
+		case <-msgCh:
+			log.Info().Msg("Restarting...")
+      if err := a.Restart(); err != nil {
+        log.Error().Err(err).Msg("Restarting error")
+        return
+      }
+      log.Info().Msg("Restarted")
+		case <-sigchan:
+			log.Info().Msg("Terminating...")
+      if err := a.Stop(); err != nil {
+        log.Error().Err(err).Msg("Termination error")
+        return
+      }
+      log.Info().Msg("Terminated")
+			return
+		default:
+			time.Sleep(time.Second * 5)
+		}
+	}
+}
